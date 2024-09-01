@@ -1,0 +1,16 @@
+﻿[
+  {
+    "Name": "Champignon",
+    "LatinName": "Agaricus bisporus",
+    "TagName": "Champignon",
+    "Description": "Edible and common mushroom.",
+    "IsPoisonous": false
+  },
+  {
+    "Name": "Destroying angel",
+    "LatinName": "Amanita virosa",
+    "TagName": "Destroying angel",
+    "Description": "Highly poisonous and potentially deadly.",
+    "IsPoisonous": true
+  }
+]

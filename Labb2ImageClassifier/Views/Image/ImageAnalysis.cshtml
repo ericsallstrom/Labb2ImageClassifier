@@ -1,0 +1,77 @@
+﻿@* @using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.Models
+
+@{
+    var predictions = ViewBag.Predictions as IList<PredictionModel>;
+    var imageUrl = ViewBag.ImageUrl as string;
+    var topPrediction = predictions?.OrderByDescending(p => p.Probability).FirstOrDefault();
+} *@
+
+@model ImageAnalysisViewModel
+
+<div class="container">
+    <h2 class="mb-4">Image Analysis</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <div class="card mb-4 shadow-lg p-3 bg-body-tertiary rounded" style="width: 32rem">
+            <img src="@Model.ImageUrl" class="card-img-top" alt="Uploaded image" />
+            <div class="card-body">
+
+                @if (Model.Mushroom != null)
+                {
+                    <h5 class="card-title">Information</h5>
+                    <p class="mb-2"><strong>Name:</strong> @Model.Mushroom.Name</p>
+                    <p class="mb-2"><strong>Latin Name:</strong> @Model.Mushroom.LatinName</p>
+                    <p class="mb-2"><strong>Description:</strong> @Model.Mushroom.Description</p>
+
+                    @if (Model.Mushroom.IsPoisonous)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"> The @Model.Mushroom.Name is poisonous and not edible!</i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert alert-success" role="alert">
+                            <i class="bi bi-check-circle"> The @Model.Mushroom.Name is edible and safe to consume.</i>
+                        </div>
+                    }
+                }
+                else if (Model.Other != null)
+                {
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> @Model.Other.Description
+                    </div>
+                }
+
+                <h5 class="card-title">Predictions</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tag</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Predictions != null && Model.Predictions.Count > 0)
+                        {
+                            @foreach (var prediction in Model.Predictions)
+                            {
+                                <tr>
+                                    <td>@prediction.TagName</td>
+                                    <td>@prediction.Probability.ToString("P3")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="mb-4">
+        <a class="btn btn-primary align-content-sm-start" asp-action="Index" asp-controller="Image">
+            <i class="bi bi-arrow-90deg-left"></i> Back
+        </a>
+    </div>
+</div>

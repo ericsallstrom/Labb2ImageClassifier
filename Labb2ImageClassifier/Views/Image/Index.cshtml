@@ -1,0 +1,79 @@
+﻿@* @{
+    var errorMessage = ViewBag.ErrorMessage as string;
+} *@
+
+@model ImageAnalysisViewModel
+
+<div>
+    <div class="text-center mb-4">
+        <h1 class="display-4">Welcome</h1>
+        <p class="lead">Utilize this AI service to classify your mushroom images and ensure they are genuine champignons (agaricus bisporus), avoiding any confusion with the dangerous destroying angel (amanita virosa) mushroom.</p>
+    </div>
+
+    <form id="classifyFormUrl" asp-action="ClassifyImageUrl" method="post">
+        <label for="imageUrl" class="form-label fw-bold">Image URL</label>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="imageUrl" id="imageUrl" placeholder="Enter Image URL" />
+            <button type="submit" class="input-group-text btn btn-primary">
+                <i class="bi bi-arrow-up"></i>
+            </button>
+        </div>
+    </form>
+
+    <h4 class="fs-5 fw-normal mb-3">- OR -</h4>
+
+    <form id="classifyFormFile" asp-action="ClassifyImageFile" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="imageFile" class="form-label fw-bold">Upload local file</label>
+            <div class="input-group">
+                <input type="file" class="form-control" name="imageFile" id="imageFile" accept=".jpg,.jpeg,.png,.bmp" />
+                <button type="submit" class="input-group-text btn btn-primary">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mt-4">
+        <div class="text-danger col">@Model.ErrorMessage</div>
+        <div id="loadingSpinner" class="col d-none">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-column mt-4">
+        <h5>Requirements</h5>
+        <hr class="m-0" />
+        <div class="mt-2 small">
+            File size should not exceed:
+            <span class="text-primary">4 MB</span>
+        </div>
+        <div class="small">
+            File formats accepted:
+            <ul>
+                <li>
+                    <span class="text-primary">jpg</span>
+                </li>
+                <li>
+                    <span class="text-primary">png</span>
+                </li>
+                <li>
+                    <span class="text-primary">bmp</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('classifyFormUrl').addEventListener('submit', function () {
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+    });
+
+    document.getElementById('classifyFormFile').addEventListener('submit', function () {
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+    });
+</script>
+
