@@ -4,6 +4,7 @@ using Labb2ImageClassifier.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 
 namespace Labb2ImageClassifier.Controllers
 {
@@ -72,16 +73,15 @@ namespace Labb2ImageClassifier.Controllers
                 var result = await _predictionClient.ClassifyImageAsync(new Guid(_keys.ProjectId), _keys.ProjectName, stream);
 
                 var topPrediction = result.Predictions.OrderByDescending(p => p.Probability).FirstOrDefault();
-                var classificationResult = HandleClassification(topPrediction.TagName);
+                if (topPrediction == null)
+                {
+                    model.ErrorMessage = "No prediction was made. Please try with another image.";
+                    return View("Index", model);
+                }
 
-                if (classificationResult is Mushroom mushroom)
-                {
-                    model.Mushroom = mushroom;
-                }
-                else if (classificationResult is Other other)
-                {
-                    model.Other = other;
-                }
+                var classificationResult = GetClassificationResult(topPrediction.TagName);
+
+                DetermineClassification(classificationResult, model);
 
                 model.Predictions = result.Predictions;
                 model.ImageUrl = imageUrl;
@@ -128,17 +128,17 @@ namespace Labb2ImageClassifier.Controllers
 
                 var result = await _predictionClient.ClassifyImageAsync(new Guid(_keys.ProjectId), _keys.ProjectName, memoryStream);
                 var topPrediction = result.Predictions.OrderByDescending(p => p.Probability).FirstOrDefault();
-                var classificationResult = HandleClassification(topPrediction.TagName);
-                model.Predictions = result.Predictions;
+                if (topPrediction == null)
+                {
+                    model.ErrorMessage = "No prediction was made. Please try with another image.";
+                    return View("Index", model);
+                }
 
-                if (classificationResult is Mushroom mushroom)
-                {
-                    model.Mushroom = mushroom;
-                }
-                else if (classificationResult is Other other)
-                {
-                    model.Other = other;
-                }
+                var classificationResult = GetClassificationResult(topPrediction.TagName);                
+
+                DetermineClassification(classificationResult, model);
+
+                model.Predictions = result.Predictions;
 
                 var base64Image = Convert.ToBase64String(memoryStream.ToArray());
                 var imageDataUrl = $"data:{imageFile.ContentType};base64,{base64Image}";
@@ -170,7 +170,7 @@ namespace Labb2ImageClassifier.Controllers
             return fileSize.HasValue && fileSize.Value <= _keys.MaxFileSizeInBytes;
         }
 
-        private IClassificationResult HandleClassification(string tagName)
+        private IClassificationResult GetClassificationResult(string tagName)
         {
             var mushroom = _service.GetMushroomByTagName(tagName);
             if (mushroom != null)
@@ -183,6 +183,18 @@ namespace Labb2ImageClassifier.Controllers
                 {
                     TagName = tagName
                 };
+            }
+        }
+
+        private void DetermineClassification(IClassificationResult classificationResult, ImageAnalysisViewModel model)
+        {
+            if (classificationResult is Mushroom mushroom)
+            {
+                model.Mushroom = mushroom;
+            }
+            else if (classificationResult is Other other)
+            {
+                model.Other = other;
             }
         }
     }
