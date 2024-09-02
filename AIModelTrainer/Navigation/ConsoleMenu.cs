@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace AIModelTrainer.Navigation
 {
-    public class Menu
-    {
-        private static readonly Lazy<Menu> _instance = new(() => new Menu());
-
+    public class ConsoleMenu
+    {        
         private const ConsoleKey keyUp = ConsoleKey.UpArrow;
         private const ConsoleKey keyDown = ConsoleKey.DownArrow;        
         private const ConsoleKey keySelect = ConsoleKey.Enter;
@@ -20,19 +18,11 @@ namespace AIModelTrainer.Navigation
         private ConsoleKey KeyPressed { get; set; }
         private int SelectedOption { get; set; }
 
-        private Menu() 
+        public ConsoleMenu() 
         {
             Prompt = string.Empty;
             MenuOptions = Array.Empty<string>();
             SelectedOption = 0;
-        }
-
-        public static Menu Instance
-        {
-            get
-            {
-                return _instance.Value;
-            }
         }
 
         public int GetMenuChoice()

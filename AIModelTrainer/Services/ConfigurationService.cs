@@ -19,7 +19,6 @@ namespace AIModelTrainer.Services
 
             var keys = new Keys();
             config.GetSection("CustomVision").Bind(keys);
-
             return keys;
         }
     }

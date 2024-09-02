@@ -38,7 +38,7 @@ namespace AIModelTrainer.Services
             return _trainingClient.GetTags(_projectId);
         }
 
-        public void UploadAndTrainImage(string imagePath, string imageTag)
+        public async Task UploadAndTrainImageAsync(string imagePath, string imageTag)
         {
             var project = GetProject();
             if (project == null)
@@ -65,7 +65,7 @@ namespace AIModelTrainer.Services
 
                 try
                 {
-                    var result = _trainingClient.CreateImagesFromFiles(_projectId, fileCreateBatch);
+                    var result = await _trainingClient.CreateImagesFromFilesAsync(_projectId, fileCreateBatch);
                     var resultImage = result.Images.FirstOrDefault();
 
                     if (resultImage.Status == "OKDuplicate")
@@ -74,7 +74,7 @@ namespace AIModelTrainer.Services
                         return;
                     }
 
-                    TrainModel();
+                    await TrainModelAsync();
                 }
                 catch (CustomVisionErrorException ex)
                 {
@@ -84,18 +84,18 @@ namespace AIModelTrainer.Services
             }
         }
 
-        private void TrainModel()
+        private async Task TrainModelAsync()
         {
             var iteration = _trainingClient.TrainProject(_projectId);
-            Console.WriteLine("\nTraining model... Please be patient.");
+            Console.WriteLine("\nTraining model... please be patient.");
 
             while (iteration.Status != "Completed")
             {
                 Thread.Sleep(500);
-                iteration = _trainingClient.GetIteration(_projectId, iteration.Id);
+                iteration = await _trainingClient.GetIterationAsync(_projectId, iteration.Id);
             }
 
-            _trainingClient.UpdateIteration(_projectId, iteration.Id, iteration);
+            await _trainingClient.UpdateIterationAsync(_projectId, iteration.Id, iteration);
             Console.WriteLine("\nTraining completed!");
             GetBackToMainMenu();
         }
